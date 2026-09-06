@@ -10,3 +10,9 @@
  - Create an Outlet in your body component
  - Create a footer
  - Create Login Page
+ - Install axios
+ - CORS - install cors in backend -> add middleware to with configuration: origin, credentials
+ - Whenever you're making API call so pass axios -> {withCredentials: true}
+ - Install redux toolkit
+  
+ 
