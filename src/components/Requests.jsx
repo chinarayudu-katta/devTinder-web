@@ -1,12 +1,24 @@
 import { useDispatch, useSelector } from 'react-redux';
 import {BASE_URL} from '../utils/constants';
-import { addRequests } from '../utils/requestSlice';
-import { useEffect } from 'react';
+import { addRequests, removeRequests } from '../utils/requestSlice';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
-
 const Requests = () => {
     const dispatch = useDispatch();
-    const requests = useSelector((store)=> store.requests)
+    const requests = useSelector((store)=> store.requests);
+    
+    const reviewRequest = async (status, _id) => {
+        try {
+            const res = await axios.post(
+                BASE_URL + "/request/review/" + status + "/" + _id,
+                 {}, 
+                 {withCredentials: true}
+            )
+            dispatch(removeRequests(_id))
+        } catch(err){
+
+        }
+    }
     const fetchRequest = async () => {
         try {
         const res = await axios.get(BASE_URL + "/user/requests/received", {
@@ -22,22 +34,22 @@ const Requests = () => {
         fetchRequest();
     }, [])
   if(!requests) return;
-    if(requests.length === 0) return <h1>No Request Found</h1>
+    if(requests.length === 0) return <h1 className="flex justify-center my-10">No Request Found</h1>
   return (
     <div className="text-center my-10">
-      <h2 className="text-bold text-white text-3xl">Connection Requests</h2>
+      <h2 className="text-bold text-white text-2xl">Connection Requests</h2>
       {requests.map((request)=> {
         const {_id, firstName, lastName, photoUrl, age, gender, about} = request.fromUserId;
         return (
         <div key={_id} className="flex justify-between items-center m-4 p-4 rounded-lg bg-base-300 w-2/3 mx-auto">
-          <div><img alt="photo" className="w-20 h-20 rounded-full" src={photoUrl} /></div>
+          <div><img alt="photo" className="w-20 h-20 rounded-full object-cover" src={photoUrl} /></div>
           <div className="text-left mx-4">
           <h2 className="font-bold text-xl">{firstName + " " + lastName}</h2>
           {age && gender && <p>{age + " " + gender}</p>}
           <p>{about}</p>
           </div>
-          <button className="btn btn-active btn-primary mx-2">Reject</button>
-        <button className="btn btn-active btn-secondary mx-2">Accept</button>
+          <button className="btn btn-active btn-primary mx-2" onClick={()=> reviewRequest("rejected", request._id)}>Reject</button>
+        <button className="btn btn-active btn-secondary mx-2" onClick={()=> reviewRequest("accepted", request._id)}>Accept</button>
         </div>
         )
     })}
